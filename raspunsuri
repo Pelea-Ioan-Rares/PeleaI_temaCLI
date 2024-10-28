@@ -1,48 +1,55 @@
-1. În OpenGL, un viewport este o zonă dreptunghiulară pe fereastra de afișare unde se redă scena grafică 3D sau 2D. 
-Practic, aceasta reprezintă porțiunea din fereastră unde se desenează rezultatul final al operațiunilor grafice.
-Fiecare obiect din spațiul de lucru 3D este proiectat pe această zonă bidimensională în fereastră după ce sunt aplicate transformările 
-(de modelare, vizualizare și proiecție De obicei, viewport-ul este setat pentru a se potrivi cu dimensiunile ferestrei aplicației, 
-dar poate fi redimensionat sau reposiționat pentru a crea efecte vizuale specifice sau pentru a permite afișarea mai multor scene simultan.
+2.Ce este anti-aliasing?
 
-2. Conceptul de frames per second (FPS), din punctul de vedere al bibliotecii OpenGL, se referă la numărul de cadre (sau imagini) 
-pe care sistemul le redă și le afișează pe ecran într-o secundă. Este o măsurătoare a performanței grafice, 
-indicând cât de rapid poate fi actualizată scena grafică și redată pentru utilizator.
+Anti-aliasing este o tehnică utilizată în grafică computerizată pentru a reduce efectul de 
+„aliased edges”, care apare atunci când liniile sau contururile sunt desenate cu o rezoluție 
+scăzută. Efectul de aliasing se manifestă prin marginile zimțate sau pixelate.
 
- 3. Metoda OnUpdateFrame() este rulată în fiecare cadru al aplicației, înainte de redarea efectivă a graficii. 
-Aceasta este folosită pentru a actualiza starea aplicației, inclusiv logica jocului, 
-pozițiile obiectelor și alte calcule necesare înainte de a apela metoda de redare. 
-Este un loc ideal pentru a gestiona intrările utilizatorului, animațiile și alte actualizări de logică.
+Cum funcționează? Anti-aliasing funcționează prin aplicarea unei metode de amestecare 
+a culorilor pixelilor de la marginea unui obiect pentru a crea o tranziție mai lină între culori,
+făcând marginile să pară mai netede.
 
-4. Modul imediat de randare (immediate mode rendering) este o metodă de redare în care fiecare vertex (vârf) 
-este specificat imediat după ce este apelată funcția de redare. În acest mod, OpenGL procesează fiecare cerere 
-de desenare pe măsură ce este primită, ceea ce poate duce la o performanță scăzută pentru scene complexe. 
-De exemplu, funcțiile precum glBegin() și glEnd() sunt utilizate pentru a defini un set de vertecși pentru un obiect grafic.
+3. Efectul rulării comenzilor GL.LineWidth(float) și GL.PointSize(float)
+    GL.LineWidth(float): Această comandă controlează lățimea liniilor desenate. 
+De exemplu, glLineWidth(2.0f) va face liniile desenate să fie de două ori mai late decât 
+lățimea implicită. Această comandă funcționează în interiorul unei zone GL.Begin(),
+dar nu este garantat că toate plăcile grafice vor accepta toate lățimile de linie.
 
-5. OpenGL 3.0 a fost ultima versiune care a păstrat suportul pentru modul imediat de randare. 
-În versiunile ulterioare, OpenGL a mutat accentul pe metodele de redare bazate pe shader și 
-buffer pentru a oferi o performanță mai bună și un control mai mare asupra procesului grafic.
+    GL.PointSize(float): Această comandă controlează dimensiunea punctelor desenate. 
+De exemplu, glPointSize(5.0f) va face ca punctele să fie de 5 ori mai mari decât dimensiunea 
+implicită. De asemenea, aceasta funcționează în interiorul unei zone GL.Begin().
 
-6. Metoda OnRenderFrame() este rulată în fiecare cadru, după ce OnUpdateFrame() a fost apelată. 
-Aceasta se ocupă cu redarea efectivă a graficii pe ecran, utilizând informațiile actualizate de la metoda de actualizare. 
-Aici se utilizează apelurile OpenGL pentru a desena obiectele și pentru a aplica efecte vizuale.
+4. Efectul directivelor de desenare
+    LineLoop: Atunci când se utilizează GL.LineLoop, se creează o linie închisă conectând 
+ultimele vertexuri cu primul. Aceasta este utilă pentru a desena poligoane deschise.
 
-7. Metoda OnResize() este necesară pentru a ajusta viewport-ul și proiecția graficii în funcție de dimensiunea ferestrei aplicației. 
-Dacă nu este apelată, OpenGL nu va ști cum să redimensioneze corect scena 3D atunci când fereastra este mărită sau micșorată, 
-ceea ce poate duce la distorsiuni vizuale sau la o redare incorectă a conținutului.
+    LineStrip: Cu GL.LineStrip, se desenază o serie de linii conectate între ele,
+folosind vertexurile în ordinea în care sunt definite. Aceasta creează o formă de linii continue.
 
-8. Metoda CreatePerspectiveFieldOfView() este utilizată pentru a genera o matrice de proiecție care definește modul în care obiectele dintr-o scenă 3D sunt proiectate pe ecran. 
-Aceasta definește un câmp vizual în stil perspectivă, unde obiectele mai apropiate par mai mari, iar obiectele mai îndepărtate par mai mici, 
-simulând astfel felul în care percepem adâncimea în viața reală.
-  Parametrii:
- fieldOfView: Unghiul de vizualizare în grade (de obicei, între 0 și 180), care determină cât de mult din scenă este vizibil. 
-    Un unghi mai mare oferă o viziune mai largă, dar poate duce la distorsiuni.
-    aspectRatio: Raportul între lățimea și înălțimea viewport-ului. Acesta este important pentru a menține proporțiile corecte ale obiectelor 3D pe ecran.
-    nearPlane: Distanța de la cameră la planul de tăiere din față. Aceasta trebuie să fie mai mare decât 0 pentru a evita problemele de redare.
-    farPlane: Distanța de la cameră la planul de tăiere din spate, care definește limita de vizibilitate a scenei.
-    
-  Domeniile de valori pentru acești parametrii variază, dar sunt în general:
+    TriangleFan: GL.TriangleFan permite desenarea unui set de triunghiuri care partajează 
+un vârf comun. Aceasta este o metodă eficientă de a crea forme convexe.
 
-    fieldOfView: 0 < fieldOfView < 180
-    aspectRatio: pozitiv (de obicei, 1.0 sau mai mult pentru un viewport pătrat sau dreptunghiular)
-    nearPlane: > 0
-    farPlane: > nearPlane
+    TriangleStrip: GL.TriangleStrip este similar cu TriangleFan, dar pentru a forma triunghiuri,
+se utilizează un set de vertexuri adiționale. Aceasta permite desenarea unei forme mai complexe 
+cu mai puține vertexuri.
+
+6. Importanța culorilor diferite în desenarea obiectelor 3D
+Folosirea culorilor diferite (gradiente sau culori selectate pe suprafață) este importantă 
+în desenarea obiectelor 3D pentru a crea un efect vizual mai plăcut și a spori profunzimea. 
+Culorile ajută la evidențierea detaliilor și formelor, permițând spectatorilor să perceapă 
+mai bine volumul și textura obiectului.
+
+7. Ce reprezintă un gradient de culoare?
+Un gradient de culoare este o tranziție lină între două sau mai multe culori. În OpenGL,
+acesta se poate obține prin interpolarea culorilor între vertexuri, permițându-le să se 
+amestece între ele. Poți realiza un gradient aplicând diferite culori fiecărui vertex și 
+lăsând OpenGL să gestioneze interpolarea.
+
+8.Ce este transparența în OpenGL?
+Transparența este controlată de canalul alpha. Acesta variază între valorile 0 și 1, unde 0 
+este complet transparent și 1 este complet opac. Utilizarea canalului de transparență permite crearea 
+unui efect de suprapunere vizuală, permițându-se ca obiectele din spate să fie vizibile prin cele din față.
+
+10.Efectul utilizării unei culori diferite pentru fiecare vertex
+Când folosești culori diferite pentru fiecare vertex în modul strip sau când desenezi triunghiuri, 
+OpenGL va aplica un gradient între acele culori. Aceasta înseamnă că culoarea va fi interpolată lin 
+între vertexuri, creând un efect de tranziție de la o culoare la alta pe suprafața obiectului.
