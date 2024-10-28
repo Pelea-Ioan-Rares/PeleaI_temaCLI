@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Immediate;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,9 +11,9 @@ namespace Pelea
     {
         static void Main(string[] args)
         {
-            using (Immediate window = new Immediate())
+            using (InteractiveWindow window = new InteractiveWindow())
             {
-                window.Run(60.0);  // Rulează aplicația la 60 FPS
+                window.Run(30.0);
             }
         }
     }
