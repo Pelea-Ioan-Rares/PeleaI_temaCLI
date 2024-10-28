@@ -59,6 +59,7 @@ namespace tema3
                 Console.WriteLine("Controale: \n R - amplifica culoarea rosie \n G - amplifica culoarea verde \n B - amplifica culoarea albastra \n C - reseteaza culoarea triunghiului \n");
 
                 clear = true;
+
                 Console.WriteLine($"Vertex 1 RGB: " + color[0].ToString() + ", 0.0, 0.0");
                 Console.WriteLine($"Vertex 2 RGB: 0.0, " + color[1].ToString() + ", 0.0");
                 Console.WriteLine($"Vertex 3 RGB: 0.0, 0.0, " + color[2].ToString());
