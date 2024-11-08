@@ -14,6 +14,8 @@ namespace Immediate
         private float cameraAngleX = 0.0f;
         private float cameraAngleY = 0.0f;
 
+        
+
         public InteractiveWindow()
             : base(800, 600, GraphicsMode.Default, "Triangle Color and Camera Control")
         {
